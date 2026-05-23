@@ -1,6 +1,8 @@
 body {
   margin: 0;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: #fff3f8;
+  color: #422438;
 }
 
 button,
@@ -16,6 +18,12 @@ textarea {
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid rgba(56, 189, 248, 0.8);
+  outline: 2px solid rgba(236, 72, 153, 0.35);
   outline-offset: 2px;
+}
+
+.section-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(248, 207, 223, 0.8);
+  box-shadow: 0 24px 70px rgba(226, 104, 146, 0.1);
 }
