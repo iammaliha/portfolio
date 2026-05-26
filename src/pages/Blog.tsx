@@ -1,167 +1,109 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, ExternalLink, Code2, ArrowRight } from 'lucide-react'
+import { Search, Calendar, Clock, ArrowRight } from 'lucide-react'
 import SEOMeta from '../components/ui/SEOMeta'
 import { useScrollReveal } from '../hooks/useScrollReveal'
-import { Card, CardContent } from '../components/ui/Card'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
-import {
-  fadeIn,
-  slideUp,
-  staggerContainer,
-  staggerItem,
-} from '../animations'
-import { projects, projectCategories } from '../data/projects'
+import { blogPosts, blogCategories } from '../data/blog'
+import { fadeIn, slideUp, staggerContainer, staggerItem } from '../animations'
 
 const ITEMS_PER_PAGE = 6
 
-function ProjectCard({ project }: { project: (typeof projects)[0] }) {
-  const gradient = project.image ?? 'from-pink-100 to-rose-50'
-  const initials = project.title
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 3)
-
+function BlogCard({ post }: { post: (typeof blogPosts)[0] }) {
   return (
-    <motion.div layout variants={staggerItem} className="group">
-      <Link to={`/projects/${project.id}`} className="block h-full">
-        <Card className="h-full overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-pink-200/30">
+    <motion.div variants={staggerItem} className="group">
+      <Link to={`/blog/${post.slug}`} className="block h-full">
+        <div className="flex h-full flex-col rounded-2xl border border-pink-100/40 bg-white shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-pink-200/20">
           <div
-            className={`relative flex h-48 w-full items-center justify-center overflow-hidden bg-gradient-to-br ${gradient}`}
+            className={`flex h-44 w-full items-center justify-center rounded-t-2xl bg-gradient-to-br ${post.image} sm:h-48`}
           >
-            <span className="font-display text-5xl font-bold text-white/20 transition-all duration-500 group-hover:scale-110 group-hover:text-white/30">
-              {initials}
+            <span className="font-display text-5xl font-bold text-white/25">
+              {post.title
+                .split(' ')
+                .map((w) => w[0])
+                .join('')
+                .slice(0, 3)}
             </span>
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="absolute inset-0 flex items-center justify-center gap-3 bg-gradient-to-t from-white/80 via-white/30 to-transparent opacity-0 transition-all duration-500 group-hover:opacity-100"
-            >
-              <Button size="sm" asChild>
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink size={14} />
-                  Live
-                </a>
-              </Button>
-              <Button size="sm" variant="secondary" asChild>
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Code2 size={14} />
-                  Code
-                </a>
-              </Button>
+          </div>
+          <div className="flex flex-1 flex-col p-5 sm:p-6">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="text-[10px]">
+                {post.category}
+              </Badge>
+            </div>
+            <h3 className="mt-3 font-display text-lg font-semibold text-slate-900 transition-colors group-hover:text-pink-600">
+              {post.title}
+            </h3>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-500 line-clamp-2">
+              {post.excerpt}
+            </p>
+            <div className="mt-4 flex items-center gap-4 text-xs text-slate-400">
+              <span className="flex items-center gap-1">
+                <Calendar size={12} />
+                {post.date}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock size={12} />
+                {post.readTime}
+              </span>
             </div>
           </div>
+        </div>
+      </Link>
+    </motion.div>
+  )
+}
 
-          <CardContent className="p-5">
-            <div className="mb-3 flex items-center justify-between">
-              <Badge variant="secondary" className="text-xs">
-                {project.category}
-              </Badge>
-              <span className="text-xs text-slate-400">{project.year}</span>
+function FeaturedCard({ post }: { post: (typeof blogPosts)[0] }) {
+  return (
+    <motion.div variants={staggerItem} className="md:col-span-2 lg:col-span-2">
+      <Link to={`/blog/${post.slug}`} className="block h-full">
+        <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-pink-100/40 bg-white shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-pink-200/20 sm:flex-row">
+          <div
+            className={`flex h-48 w-full shrink-0 items-center justify-center bg-gradient-to-br ${post.image} sm:h-auto sm:w-72`}
+          >
+            <span className="font-display text-6xl font-bold text-white/25">
+              {post.title
+                .split(' ')
+                .map((w) => w[0])
+                .join('')
+                .slice(0, 3)}
+            </span>
+          </div>
+          <div className="flex flex-1 flex-col p-6 sm:p-8">
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <Calendar size={12} />
+              {post.date}
+              <span className="mx-2">&middot;</span>
+              <Clock size={12} />
+              {post.readTime}
             </div>
-
-            <h3 className="font-display text-lg font-semibold text-slate-900 transition-colors group-hover:text-pink-600">
-              {project.title}
+            <h3 className="mt-3 font-display text-xl font-semibold text-slate-900 transition-colors group-hover:text-pink-600 sm:text-2xl">
+              {post.title}
             </h3>
-
-            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-slate-500">
-              {project.description}
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-500">
+              {post.excerpt}
             </p>
-
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {project.tags.slice(0, 3).map((tag) => (
-                <Badge key={tag} variant="outline" className="text-[10px]">
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Badge variant="outline" className="text-xs">
+                {post.category}
+              </Badge>
+              {post.tags.slice(0, 2).map((tag) => (
+                <Badge key={tag} variant="outline" className="text-xs">
                   {tag}
                 </Badge>
               ))}
             </div>
-          </CardContent>
-        </Card>
-      </Link>
-    </motion.div>
-  )
-}
-
-function FeaturedProjectCard({ project }: { project: (typeof projects)[0] }) {
-  const gradient = project.image ?? 'from-pink-100 to-rose-50'
-  const initials = project.title
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 3)
-
-  return (
-    <motion.div variants={staggerItem} className="md:col-span-2 lg:col-span-2">
-      <Link to={`/projects/${project.id}`} className="block h-full">
-        <Card className="h-full overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-pink-200/30">
-          <div
-            className={`flex h-48 w-full items-center justify-center bg-gradient-to-br ${gradient} md:h-56`}
-          >
-            <span className="font-display text-6xl font-bold text-white/20 transition-all duration-500 group-hover:scale-110 group-hover:text-white/30">
-              {initials}
-            </span>
           </div>
-          <CardContent className="p-6 sm:p-8">
-            <div className="mb-3 flex items-center justify-between">
-              <Badge variant="secondary" className="text-xs">
-                {project.category}
-              </Badge>
-              <span className="text-xs text-slate-400">{project.year}</span>
-            </div>
-            <h3 className="font-display text-xl font-semibold text-slate-900 transition-colors group-hover:text-pink-600 sm:text-2xl">
-              {project.title}
-            </h3>
-            <p className="mt-3 leading-relaxed text-slate-500">
-              {project.description}
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
-                <Badge key={tag}>{tag}</Badge>
-              ))}
-            </div>
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="mt-6 flex gap-3"
-            >
-              <Button size="sm" asChild>
-                <a
-                  href={project.liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <ExternalLink size={14} />
-                  Live Demo
-                </a>
-              </Button>
-              <Button size="sm" variant="secondary" asChild>
-                <a
-                  href={project.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Code2 size={14} />
-                  View Code
-                </a>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        </div>
       </Link>
     </motion.div>
   )
 }
 
-export default function Projects() {
+export default function Blog() {
   const [category, setCategory] = useState('All')
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -170,10 +112,10 @@ export default function Projects() {
   const { ref: featuredRef, isVisible: featuredVisible } = useScrollReveal()
   const { ref: gridRef, isVisible: gridVisible } = useScrollReveal()
 
-  const featuredProjects = useMemo(() => projects.filter((p) => p.featured), [])
+  const featured = useMemo(() => blogPosts.filter((p) => p.featured), [])
 
   const filtered = useMemo(() => {
-    let result = projects
+    let result = blogPosts
     if (category !== 'All') {
       result = result.filter((p) => p.category === category)
     }
@@ -182,7 +124,8 @@ export default function Projects() {
       result = result.filter(
         (p) =>
           p.title.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q),
+          p.excerpt.toLowerCase().includes(q) ||
+          p.tags.some((t) => t.toLowerCase().includes(q)),
       )
     }
     return result
@@ -194,14 +137,9 @@ export default function Projects() {
     page * ITEMS_PER_PAGE,
   )
 
-  const handleCategoryChange = (cat: string) => {
-    setCategory(cat)
-    setPage(1)
-  }
-
   return (
     <motion.div initial="hidden" animate="visible" variants={fadeIn}>
-      <SEOMeta title="Projects" description="Explore web development projects by Maliha Tasnim — portfolios, dashboards, SaaS, and more." />
+      <SEOMeta title="Blog" description="Thoughts on frontend development, UI/UX design, and web craftsmanship by Maliha Tasnim." />
       {/* ── Hero ── */}
       <section ref={heroRef} className="relative overflow-hidden py-28">
         <div className="absolute inset-0 bg-gradient-to-b from-pink-50 via-white to-white" />
@@ -216,32 +154,29 @@ export default function Projects() {
           >
             <motion.div variants={slideUp}>
               <span className="inline-block rounded-full bg-pink-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-pink-600">
-                My Portfolio
+                Blog
               </span>
             </motion.div>
-
             <motion.h1
               variants={slideUp}
               className="mt-6 font-display text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl"
             >
               <span className="bg-gradient-to-r from-pink-500 via-rose-500 to-pink-500 bg-clip-text text-transparent">
-                Featured Projects
+                Thoughts &amp; Insights
               </span>
             </motion.h1>
-
             <motion.p
               variants={slideUp}
               className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-500"
             >
-              A curated collection of websites and applications I have designed
-              and developed. Each project reflects my passion for elegant,
-              user-centered design.
+              Writings about frontend development, UI/UX design, and creating
+              beautiful digital experiences.
             </motion.p>
           </motion.div>
         </div>
       </section>
 
-      {/* ── Featured Projects ── */}
+      {/* ── Featured ── */}
       <section ref={featuredRef} className="-mt-10 pb-16">
         <div className="mx-auto max-w-6xl px-6">
           <motion.div
@@ -251,19 +186,16 @@ export default function Projects() {
           >
             <motion.div variants={slideUp} className="mb-8 text-center">
               <h2 className="font-display text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-                Featured Work
+                Featured Articles
               </h2>
-              <p className="mt-2 text-slate-500">
-                Highlighted projects that showcase my best work
-              </p>
             </motion.div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {featuredProjects.slice(0, 3).map((project, i) =>
+              {featured.slice(0, 3).map((post, i) =>
                 i === 0 ? (
-                  <FeaturedProjectCard key={project.id} project={project} />
+                  <FeaturedCard key={post.slug} post={post} />
                 ) : (
-                  <ProjectCard key={project.id} project={project} />
+                  <BlogCard key={post.slug} post={post} />
                 ),
               )}
             </div>
@@ -271,7 +203,7 @@ export default function Projects() {
         </div>
       </section>
 
-      {/* ── All Projects ── */}
+      {/* ── All Posts ── */}
       <section ref={gridRef} className="pb-24">
         <div className="mx-auto max-w-6xl px-6">
           <motion.div
@@ -281,21 +213,20 @@ export default function Projects() {
           >
             <motion.div variants={slideUp} className="mb-10 text-center">
               <h2 className="font-display text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-                All Projects
+                All Posts
               </h2>
-              <p className="mt-2 text-slate-500">
-                Browse through my complete project collection
-              </p>
             </motion.div>
 
-            {/* Filter + Search */}
             <motion.div variants={slideUp} className="mb-10">
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
                 <div className="flex flex-wrap justify-center gap-2">
-                  {projectCategories.map((cat) => (
+                  {blogCategories.map((cat) => (
                     <button
                       key={cat}
-                      onClick={() => handleCategoryChange(cat)}
+                      onClick={() => {
+                        setCategory(cat)
+                        setPage(1)
+                      }}
                       className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
                         category === cat
                           ? 'bg-pink-500 text-white shadow-lg shadow-pink-200/50'
@@ -305,7 +236,10 @@ export default function Projects() {
                       {cat}
                       {cat !== 'All' && (
                         <span className="ml-1.5 text-xs opacity-70">
-                          ({projects.filter((p) => p.category === cat).length}
+                          (
+                          {
+                            blogPosts.filter((p) => p.category === cat).length
+                          }
                           )
                         </span>
                       )}
@@ -320,7 +254,7 @@ export default function Projects() {
                   />
                   <input
                     type="text"
-                    placeholder="Search projects..."
+                    placeholder="Search articles..."
                     value={search}
                     onChange={(e) => {
                       setSearch(e.target.value)
@@ -332,8 +266,7 @@ export default function Projects() {
               </div>
             </motion.div>
 
-            {/* Grid */}
-            <motion.div variants={slideUp} className="min-h-[400px]">
+            <motion.div variants={slideUp} className="min-h-[300px]">
               <AnimatePresence mode="wait">
                 {paginated.length > 0 ? (
                   <motion.div
@@ -344,8 +277,8 @@ export default function Projects() {
                     transition={{ duration: 0.3 }}
                     className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
                   >
-                    {paginated.map((project) => (
-                      <ProjectCard key={project.id} project={project} />
+                    {paginated.map((post) => (
+                      <BlogCard key={post.slug} post={post} />
                     ))}
                   </motion.div>
                 ) : (
@@ -354,15 +287,12 @@ export default function Projects() {
                     animate={{ opacity: 1 }}
                     className="flex flex-col items-center justify-center py-16 text-center"
                   >
-                    <Search
-                      size={40}
-                      className="mb-4 text-pink-200"
-                    />
+                    <Search size={40} className="mb-4 text-pink-200" />
                     <h3 className="font-display text-xl font-semibold text-slate-900">
-                      No projects found
+                      No articles found
                     </h3>
                     <p className="mt-2 text-slate-500">
-                      Try adjusting your search or filter criteria
+                      Try a different category or search term
                     </p>
                     <Button
                       variant="ghost"
@@ -380,7 +310,6 @@ export default function Projects() {
               </AnimatePresence>
             </motion.div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <motion.div
                 variants={slideUp}
@@ -393,7 +322,6 @@ export default function Projects() {
                 >
                   <ArrowRight size={16} className="rotate-180" />
                 </button>
-
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                   (p) => (
                     <button
@@ -409,7 +337,6 @@ export default function Projects() {
                     </button>
                   ),
                 )}
-
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
@@ -429,22 +356,21 @@ export default function Projects() {
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-pink-500 via-rose-500 to-pink-600 px-8 py-16 text-center shadow-2xl shadow-pink-200/40 sm:px-16">
             <div className="absolute top-0 right-0 h-64 w-64 translate-x-1/3 -translate-y-1/3 rounded-full bg-white/10 blur-3xl" />
             <div className="absolute bottom-0 left-0 h-48 w-48 -translate-x-1/4 translate-y-1/4 rounded-full bg-white/10 blur-3xl" />
-
             <div className="relative">
               <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
-                Have a project in mind?
+                Have a topic in mind?
               </h2>
               <p className="mx-auto mt-4 max-w-lg text-pink-100">
-                Let us work together to bring your vision to life with a
-                beautiful, functional website.
+                I am always exploring new ideas. If there is something you would
+                like me to write about, let me know.
               </p>
               <Button
                 variant="secondary"
                 size="lg"
                 className="mt-8 bg-white text-pink-600 hover:bg-pink-50"
+                asChild
               >
-                Start Your Project
-                <ArrowRight size={16} />
+                <a href="/#contact">Get in Touch</a>
               </Button>
             </div>
           </div>

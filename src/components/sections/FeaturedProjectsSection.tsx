@@ -1,26 +1,15 @@
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import SEOMeta from '../components/ui/SEOMeta'
-import HeroSection from '../components/sections/HeroSection'
-import TrustedBySection from '../components/sections/TrustedBySection'
-import ExperienceStatsSection from '../components/sections/ExperienceStatsSection'
-import TechStackSection from '../components/sections/TechStackSection'
-import TestimonialsSection from '../components/sections/TestimonialsSection'
-import WorkingProcessSection from '../components/sections/WorkingProcessSection'
-import BlogSection from '../components/sections/BlogSection'
-import ContactSection from '../components/sections/ContactSection'
-import CTABannerSection from '../components/sections/CTABannerSection'
-import { Card, CardContent } from '../components/ui/Card'
-import { Badge } from '../components/ui/Badge'
-import { Button } from '../components/ui/Button'
-import { useScrollReveal } from '../hooks/useScrollReveal'
-import { fadeIn, slideUp, staggerContainer, staggerItem } from '../animations'
-import { projects } from '../data/projects'
+import { useScrollReveal } from '../../hooks/useScrollReveal'
+import { Card, CardContent } from '../ui/Card'
+import { Badge } from '../ui/Badge'
+import { Button } from '../ui/Button'
+import { slideUp, staggerContainer, staggerItem } from '../../animations'
+import { projects } from '../../data/projects'
 
-const featured = projects.filter((p) => p.featured).slice(0, 3)
+const featured = projects.filter((p) => p.featured)
 
-function HomeFeaturedProjects() {
+export default function FeaturedProjectsSection() {
   const { ref, isVisible } = useScrollReveal()
 
   return (
@@ -48,7 +37,7 @@ function HomeFeaturedProjects() {
           >
             {featured.map((project, i) => (
               <motion.div
-                key={project.id}
+                key={project.title}
                 variants={staggerItem}
                 className={i === 0 ? 'md:col-span-2 lg:col-span-2' : ''}
               >
@@ -83,36 +72,16 @@ function HomeFeaturedProjects() {
           </motion.div>
 
           <motion.div variants={slideUp} className="mt-10 text-center">
-            <Button variant="secondary" className="group" asChild>
-              <Link to="/projects">
-                View All Projects
-                <ArrowRight
-                  size={14}
-                  className="transition-transform group-hover:translate-x-1"
-                />
-              </Link>
+            <Button variant="secondary" className="group">
+              View All Projects
+              <ArrowRight
+                size={14}
+                className="transition-transform group-hover:translate-x-1"
+              />
             </Button>
           </motion.div>
         </motion.div>
       </div>
     </section>
-  )
-}
-
-export default function Home() {
-  return (
-    <motion.div initial="hidden" animate="visible" variants={fadeIn}>
-      <SEOMeta title="Home" description="Maliha Tasnim — Frontend Developer at WebNest, crafting calm, feminine, and modern web experiences." />
-      <HeroSection />
-      <TrustedBySection />
-      <HomeFeaturedProjects />
-      <ExperienceStatsSection />
-      <TechStackSection />
-      <TestimonialsSection />
-      <WorkingProcessSection />
-      <BlogSection />
-      <ContactSection />
-      <CTABannerSection />
-    </motion.div>
   )
 }
